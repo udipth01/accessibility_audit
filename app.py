@@ -76,8 +76,11 @@ def scan(subpath: str = Form(...)):
     success = scan_page(full_url)
     if not success:
         raise HTTPException(500, "Scan failed")
-
-    build_dev_document()
+    
+    try:
+        build_dev_document()
+    except Exception as e:
+        raise HTTPException(500, f"Report generation failed: {e}")
 
     return {
         "message": "Scan completed",
@@ -91,3 +94,7 @@ def download_report():
         "developer_accessibility_report.xlsx",
         filename="accessibility_report.xlsx"
     )
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
