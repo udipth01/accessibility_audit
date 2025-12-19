@@ -56,13 +56,33 @@ def analyze_page(url, session):
 
     page["MultipleOrMissingH1"] = headings.count(1) != 1
 
+
     for img in soup.find_all("img"):
-        if not (img.get("alt") or "").strip():
+        src = (
+            img.get("src")
+            or img.get("data-src")
+            or img.get("data-src-img")
+            or img.get("data-lazy-src")
+            )
+        
+        if not src:
+            continue
+
+        alt = (img.get("alt") or "").strip()
+
+        aria_hidden = img.get("aria-hidden")
+        role = img.get("role")
+
+        # Skip decorative images
+        if aria_hidden == "true" or role == "presentation":
+            continue
+
+        if not alt:
             page["MissingAlt"].append({
-                "src": urljoin(url, img.get("src","")),
+                "src": urljoin(url, src),
                 "html": str(img)[:200]
             })
-
+            
     for a in soup.find_all("a", href=True):
         if not ((a.get_text() or "").strip() or a.get("aria-label")):
             page["LinksNoName"].append({
