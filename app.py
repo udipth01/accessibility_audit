@@ -2,12 +2,62 @@ import os
 from fastapi import FastAPI, Form, HTTPException
 from fastapi.responses import FileResponse
 from scan_single_page import scan_page
-from build_dev_document import build_dev_document
+from reports import build_dev_document
+from fastapi.responses import HTMLResponse
 
 BASE_WEBSITE = os.environ.get("BASE_WEBSITE")
 
 app = FastAPI(title="Finideas Accessibility Scanner")
 
+@app.get("/", response_class=HTMLResponse)
+def home():
+    return """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Finideas Accessibility Scanner</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 40px;
+            }
+            input {
+                padding: 8px;
+                width: 300px;
+            }
+            button {
+                padding: 8px 16px;
+                margin-left: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <h2>Finideas Accessibility Scanner</h2>
+
+        <form method="post" action="/scan">
+            <label>
+                Page path (example: <code>/ilts</code>)
+            </label><br><br>
+
+            <input
+                type="text"
+                name="subpath"
+                placeholder="/ilts"
+                required
+            />
+
+            <button type="submit">Scan</button>
+        </form>
+
+        <br>
+
+        <p>
+            After scan completes:
+            <a href="/download-report">Download Report</a>
+        </p>
+    </body>
+    </html>
+    """
 
 @app.post("/scan")
 def scan(subpath: str = Form(...)):
