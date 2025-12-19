@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI, Form, HTTPException
 from fastapi.responses import FileResponse
 from scan_single_page import scan_page
-from reports import build_dev_document
+from reports.build_dev_document import build_dev_document
 from fastapi.responses import HTMLResponse
 
 BASE_WEBSITE = os.environ.get("BASE_WEBSITE")
